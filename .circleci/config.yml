@@ -64,6 +64,14 @@ terraform_apply: &terraform_apply
       cd terraform
       terraform apply terraform.plan
 
+terraform_destroy: &terraform_destroy
+  run:
+    name: Running Terraform Destroy
+    command: |
+      source $BASH_ENV
+      cd terraform
+      terraform destroy
+
 install-aws-cli-alpine: &install-aws-cli-alpine
   run:
     name: Installing AWS CLI Alpine
@@ -104,6 +112,14 @@ jobs:
         - *terraform_init
         - *terraform_apply
 
+  run-terraform-destroy:
+      <<: *default_config
+      steps:
+        - *install-aws-cli-alpine
+        - *set_environment
+        - *terraform_init
+        - *terraform_destroy
+
 workflows:
   version: 1
   deploy-infra: 
@@ -112,3 +128,6 @@ workflows:
       - run-terraform-apply:
           requires:
             - run-terraform-plan
+      - run-terraform-destroy:
+          requires:
+            -run-terraform-apply
