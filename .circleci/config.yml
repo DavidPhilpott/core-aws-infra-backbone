@@ -117,6 +117,7 @@ jobs:
       steps:
 #        - *install-aws-cli-alpine
         - *set_environment
+        - *restore_repo
         - *terraform_init
         - *terraform_destroy
 
