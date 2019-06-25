@@ -87,7 +87,7 @@ jobs:
       - *set_environment
       - *save_repo
       - *terraform_init
-      - *terraform_plan
+      - *terraform_plan -out=terraform.plan
       - persist_to_workspace:
           root: *working_directory
           paths:
