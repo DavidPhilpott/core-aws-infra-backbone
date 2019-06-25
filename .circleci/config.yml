@@ -72,26 +72,26 @@ terraform_destroy: &terraform_destroy
       cd terraform
       terraform destroy
 
-install-aws-cli-alpine: &install-aws-cli-alpine
-  run:
-    name: Installing AWS CLI Alpine
-    command: |
-      apk -v --update add \
-      python \
-      py-pip \
-      jq \
-      groff \
-      less \
-      mailcap && \
-      pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic && \
-      apk -v --purge del py-pip
+#install-aws-cli-alpine: &install-aws-cli-alpine
+#  run:
+#    name: Installing AWS CLI Alpine
+#    command: |
+#      apk -v --update add \
+#      python \
+#      py-pip \
+#      jq \
+#      groff \
+#      less \
+#      mailcap && \
+#      pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic && \
+#      apk -v --purge del py-pip
 
 jobs:
   run-terraform-plan:
     <<: *default_config
     steps:
       - checkout
-      - *install-aws-cli-alpine
+#      - *install-aws-cli-alpine
       - *set_environment
       - *save_repo
       - *terraform_init
@@ -105,7 +105,7 @@ jobs:
       <<: *default_config
       steps:
         - *restore_repo
-        - *install-aws-cli-alpine
+#        - *install-aws-cli-alpine
         - *set_environment
         - attach_workspace:
             at: *working_directory
@@ -115,7 +115,7 @@ jobs:
   run-terraform-destroy:
       <<: *default_config
       steps:
-        - *install-aws-cli-alpine
+#        - *install-aws-cli-alpine
         - *set_environment
         - *terraform_init
         - *terraform_destroy
