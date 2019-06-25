@@ -110,5 +110,5 @@ workflows:
     jobs:
       - run-terraform-plan
       - run-terraform-apply:
-          requires:
-            - run-terraform-plan
+        requires:
+          - run-terraform-plan
