@@ -130,4 +130,4 @@ workflows:
             - run-terraform-plan
       - run-terraform-destroy:
           requires:
-            -run-terraform-apply
+            - run-terraform-apply
