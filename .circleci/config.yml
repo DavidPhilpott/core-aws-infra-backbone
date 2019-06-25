@@ -54,7 +54,7 @@ terraform_plan: &terraform_plan
       source $BASH_ENV
       pwd && ls -ltr
       cd terraform
-      terraform plan
+      terraform plan -out=terraform.plan
 
 terraform_apply: &terraform_apply
   run:
@@ -87,7 +87,7 @@ jobs:
       - *set_environment
       - *save_repo
       - *terraform_init
-      - *terraform_plan -out=terraform.plan
+      - *terraform_plan
       - persist_to_workspace:
           root: *working_directory
           paths:
