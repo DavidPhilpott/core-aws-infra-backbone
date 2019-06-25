@@ -1,0 +1,117 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@0.1.13
+
+set_environment: &set_environment
+  run:
+    name: Set environmental variables for terraform
+    command: |
+      cd && touch $BASH_ENV
+      echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> $BASH_ENV
+      echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY' >> $BASH_ENV
+
+base_image: &base_image
+  hashicorp/terraform:0.12.2
+
+working_directory: &working_directory
+  ~/working
+
+default_config: &default_config
+  docker:
+    - image: *base_image
+  working_directory: *working_directory
+  environment:
+    BASH_ENV: /root/.bashrc
+
+repo_cache_key: &repo_cache_key
+  v1-repo-{{ .Branch }}-{{ .Revision }}
+
+restore_repo: &restore_repo
+  restore_cache:
+    key: *repo_cache_key
+
+save_repo: &save_repo
+  save_cache:
+    key: *repo_cache_key
+    paths:
+      - *working_directory
+
+terraform_init: &terraform_init
+  run:
+    name: terraform init
+    command: |
+      mkdir -p ~/.ssh && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+      source $BASH_ENV
+      cd terraform
+      ls -ltr
+      terraform init
+
+terraform_plan: &terraform_plan
+  run:
+    name: terraform plan
+    command: |
+      source $BASH_ENV
+      pwd && ls -ltr
+      cd terraform
+      terraform plan
+
+terraform_apply: &terraform_apply
+  run:
+    name: terraform apply
+    command: |
+      source $BASH_ENV
+      cd terraform
+      terraform apply terraform.plan
+
+install-aws-cli-alpine: &install-aws-cli-alpine
+  run:
+    name: install-aws-cli-alpine
+    command: |
+      apk -v --update add \
+      python \
+      py-pip \
+      jq \
+      groff \
+      less \
+      mailcap && \
+      pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic && \
+      apk -v --purge del py-pip
+
+apply_job_terraform_plan: &apply_job_terraform_plan
+  <<: *default_config
+  steps:
+    - *restore_repo
+    - *install-aws-cli-alpine
+    - *set_environment
+    - attach_workspace:
+        at: *working_directory
+    - *terraform_init
+    - *terraform_apply
+
+jobs:
+   terraform-plan:
+    <<: *default_config
+    steps:
+      - checkout
+      - *install-aws-cli-alpine
+      - *set_environment
+      - *save_repo
+      - *terraform_init
+      - *terraform_plan
+      - persist_to_workspace:
+          root: *working_directory
+          paths:
+            - terraform/terraform.plan
+
+  terraform_apply:
+    <<: *apply_job_terraform_plan
+
+workflows:
+  version: 1
+  deploy: 
+    jobs:
+      - terraform_plan:
+      - terraform_apply:
+          requires:
+            - terraform_plan
