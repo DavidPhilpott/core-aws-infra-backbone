@@ -70,7 +70,7 @@ terraform_destroy: &terraform_destroy
     command: |
       source $BASH_ENV
       cd terraform
-      terraform destroy
+      terraform destroy -auto-approve
 
 #install-aws-cli-alpine: &install-aws-cli-alpine
 #  run:
