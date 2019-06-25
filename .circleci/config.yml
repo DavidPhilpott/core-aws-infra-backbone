@@ -104,8 +104,8 @@ jobs:
           paths:
             - terraform/terraform.plan
 
-  terraform_apply:
-    <<: *apply_job_terraform_plan
+    terraform_apply:
+      <<: *apply_job_terraform_plan
 
 workflows:
   version: 1
