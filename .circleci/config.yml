@@ -90,7 +90,7 @@ apply_job_terraform_plan: &apply_job_terraform_plan
     - *terraform_apply
 
 jobs:
-   terraform-plan:
+   run-terraform-plan:
     <<: *default_config
     steps:
       - checkout
@@ -104,14 +104,14 @@ jobs:
           paths:
             - terraform/terraform.plan
 
-    terraform_apply:
+    run-terraform_apply:
       <<: *apply_job_terraform_plan
 
 workflows:
   version: 1
   deploy: 
     jobs:
-      - terraform_plan:
-      - terraform_apply:
+      - run-terraform-plan:
+      - run-terraform-apply:
           requires:
-            - terraform_plan
+            - run-terraform-plan
