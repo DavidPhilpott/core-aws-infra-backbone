@@ -78,17 +78,6 @@ install-aws-cli-alpine: &install-aws-cli-alpine
       pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic && \
       apk -v --purge del py-pip
 
-apply_job_terraform_plan: &apply_job_terraform_plan
-  <<: *default_config
-  steps:
-    - *restore_repo
-    - *install-aws-cli-alpine
-    - *set_environment
-    - attach_workspace:
-      at: *working_directory
-    - *terraform_init
-    - *terraform_apply
-
 jobs:
   run-terraform-plan:
     <<: *default_config
@@ -99,19 +88,27 @@ jobs:
       - *save_repo
       - *terraform_init
       - *terraform_plan
-      - persist_to_workspace:
-        root: *working_directory
-        paths:
-          - terraform/terraform.pl
-
-  run-terraform-apply:
-    <<: *apply_job_terraform_plan
+#      - persist_to_workspace:
+#        root: *working_directory
+#        paths:
+#          - terraform/terraform.pl
+#
+#  run-terraform-apply:
+#      <<: *default_config
+#      steps:
+#        - *restore_repo
+#        - *install-aws-cli-alpine
+#        - *set_environment
+#        - attach_workspace:
+#          at: *working_directory
+#        - *terraform_init
+#        - *terraform_apply
 
 workflows:
   version: 1
   deploy: 
     jobs:
       - run-terraform-plan:
-      - run-terraform-apply:
-          requires:
-            - run-terraform-plan
+#      - run-terraform-apply:
+#          requires:
+#            - run-terraform-plan
