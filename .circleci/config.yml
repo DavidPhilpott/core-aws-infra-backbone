@@ -108,7 +108,7 @@ workflows:
   version: 1
   deploy: 
     jobs:
-      - run-terraform-plan:
+      - run-terraform-plan
 #      - run-terraform-apply:
 #          requires:
 #            - run-terraform-plan
