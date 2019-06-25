@@ -91,7 +91,7 @@ jobs:
       - persist_to_workspace:
           root: *working_directory
           paths:
-            - terraform/terraform.pl
+            - terraform/terraform.plan
 
   run-terraform-apply:
       <<: *default_config
