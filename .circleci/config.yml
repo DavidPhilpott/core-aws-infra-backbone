@@ -85,12 +85,12 @@ apply_job_terraform_plan: &apply_job_terraform_plan
     - *install-aws-cli-alpine
     - *set_environment
     - attach_workspace:
-        at: *working_directory
+      at: *working_directory
     - *terraform_init
     - *terraform_apply
 
 jobs:
-   run-terraform-plan:
+  run-terraform-plan:
     <<: *default_config
     steps:
       - checkout
@@ -100,12 +100,12 @@ jobs:
       - *terraform_init
       - *terraform_plan
       - persist_to_workspace:
-          root: *working_directory
-          paths:
-            - terraform/terraform.plan
+        root: *working_directory
+        paths:
+          - terraform/terraform.pl
 
-    run-terraform_apply:
-      <<: *apply_job_terraform_plan
+  run-terraform-apply:
+    <<: *apply_job_terraform_plan
 
 workflows:
   version: 1
