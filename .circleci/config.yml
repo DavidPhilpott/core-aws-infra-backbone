@@ -5,7 +5,7 @@ orbs:
 
 set_environment: &set_environment
   run:
-    name: Set environmental variables for terraform
+    name: Setting Environmental Variables
     command: |
       cd && touch $BASH_ENV
       echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> $BASH_ENV
@@ -39,7 +39,7 @@ save_repo: &save_repo
 
 terraform_init: &terraform_init
   run:
-    name: terraform init
+    name: Running Terraform Init
     command: |
       mkdir -p ~/.ssh && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
       source $BASH_ENV
@@ -49,7 +49,7 @@ terraform_init: &terraform_init
 
 terraform_plan: &terraform_plan
   run:
-    name: terraform plan
+    name: Running Terraform Plan
     command: |
       source $BASH_ENV
       pwd && ls -ltr
@@ -58,7 +58,7 @@ terraform_plan: &terraform_plan
 
 terraform_apply: &terraform_apply
   run:
-    name: terraform apply
+    name: Running Terraform Apply
     command: |
       source $BASH_ENV
       cd terraform
@@ -66,7 +66,7 @@ terraform_apply: &terraform_apply
 
 install-aws-cli-alpine: &install-aws-cli-alpine
   run:
-    name: install-aws-cli-alpine
+    name: Installing AWS CLI Pipeline
     command: |
       apk -v --update add \
       python \
@@ -88,27 +88,27 @@ jobs:
       - *save_repo
       - *terraform_init
       - *terraform_plan
-#      - persist_to_workspace:
-#        root: *working_directory
-#        paths:
-#          - terraform/terraform.pl
-#
-#  run-terraform-apply:
-#      <<: *default_config
-#      steps:
-#        - *restore_repo
-#        - *install-aws-cli-alpine
-#        - *set_environment
-#        - attach_workspace:
-#          at: *working_directory
-#        - *terraform_init
-#        - *terraform_apply
+      - persist_to_workspace:
+        root: *working_directory
+        paths:
+          - terraform/terraform.pl
+
+  run-terraform-apply:
+      <<: *default_config
+      steps:
+        - *restore_repo
+        - *install-aws-cli-alpine
+        - *set_environment
+        - attach_workspace:
+          at: *working_directory
+        - *terraform_init
+        - *terraform_apply
 
 workflows:
   version: 1
   deploy: 
     jobs:
       - run-terraform-plan
-#      - run-terraform-apply:
-#          requires:
-#            - run-terraform-plan
+      - run-terraform-apply:
+          requires:
+            - run-terraform-plan
