@@ -89,9 +89,9 @@ jobs:
       - *terraform_init
       - *terraform_plan
       - persist_to_workspace:
-        root: *working_directory
-        paths:
-          - terraform/terraform.pl
+          root: *working_directory
+          paths:
+            - terraform/terraform.pl
 
   run-terraform-apply:
       <<: *default_config
@@ -110,5 +110,5 @@ workflows:
     jobs:
       - run-terraform-plan
       - run-terraform-apply:
-        requires:
-          - run-terraform-plan
+          requires:
+            - run-terraform-plan
