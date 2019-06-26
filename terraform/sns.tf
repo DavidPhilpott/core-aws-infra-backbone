@@ -14,7 +14,7 @@ resource "aws_sns_topic_policy" "core_message_inbox_topic_policy" {
   arn    = aws_sns_topic.core_message_inbox.arn
   policy = data.aws_iam_policy_document.core_message_inbox_topic_policy_document.json
 
-  ags = merge(
+  tags = merge(
     {
       "Name" = aws_sns_topic_policy.core_message_inbox_topic_policy.name
     },
