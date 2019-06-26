@@ -1,13 +1,28 @@
-resource "aws_sns_topic" "backbone_message_inbox" {
-  name = "backbone-message-inbox"
+resource "aws_sns_topic" "core_message_inbox" {
+  name = "core-message-inbox"
+
+  tags = merge(
+    {
+      "Name" = aws_sns_topic.core_message_inbox.name
+    },
+    local.common_tags
+  )
+
 }
 
-resource "aws_sns_topic_policy" "backbone_message_inbox_topic_policy" {
-  arn    = aws_sns_topic.backbone_message_inbox.arn
-  policy = data.aws_iam_policy_document.backbone_message_inbox_topic_policy_document.json
+resource "aws_sns_topic_policy" "core_message_inbox_topic_policy" {
+  arn    = aws_sns_topic.core_message_inbox.arn
+  policy = data.aws_iam_policy_document.core_message_inbox_topic_policy_document.json
+
+  ags = merge(
+    {
+      "Name" = aws_sns_topic_policy.core_message_inbox_topic_policy.name
+    },
+    local.common_tags
+  )
 }
 
-data "aws_iam_policy_document" "backbone_message_inbox_topic_policy_document" {
+data "aws_iam_policy_document" "core_message_inbox_topic_policy_document" {
   statement {
     actions = [
       "SNS:Subscribe",
@@ -37,7 +52,7 @@ data "aws_iam_policy_document" "backbone_message_inbox_topic_policy_document" {
     }
 
     resources = [
-      "${aws_sns_topic.backbone_message_inbox.arn}",
+      "${aws_sns_topic.core_message_inbox.arn}",
     ]
 
   }
