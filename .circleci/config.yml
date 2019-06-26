@@ -112,6 +112,6 @@ workflows:
       - run-terraform-apply:
           requires:
             - run-terraform-plan
-      - run-terraform-destroy:
-          requires:
-            - run-terraform-apply
+#      - run-terraform-destroy:
+#          requires:
+#            - run-terraform-apply#
