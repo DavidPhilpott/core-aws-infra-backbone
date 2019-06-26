@@ -3,7 +3,7 @@ resource "aws_sns_topic" "core_message_inbox" {
 
   tags = merge(
     {
-      "Name" = aws_sns_topic.core_message_inbox.name
+      "Name" = "core-message-inbox"
     },
     local.common_tags
   )
@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "core_message_inbox_topic_policy_document" {
     }
 
     resources = [
-      "${aws_sns_topic.core_message_inbox.arn}",
+      aws_sns_topic.core_message_inbox.arn,
     ]
 
   }
