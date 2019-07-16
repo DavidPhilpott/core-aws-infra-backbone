@@ -1,4 +1,4 @@
-resource "aws_sns_topic" "core_message_inbox_arn_parameter" {
+resource "aws_sns_topic" "core_message_inbox" {
   name = "core-message-inbox"
 
   tags = merge(
