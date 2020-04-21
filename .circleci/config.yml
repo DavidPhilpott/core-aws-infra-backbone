@@ -112,6 +112,9 @@ workflows:
       - run-terraform-apply:
           requires:
             - run-terraform-plan
+          filters:
+            branches:
+              only: master
 #      - run-terraform-destroy:
 #          requires:
 #            - run-terraform-apply#
