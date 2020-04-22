@@ -71,7 +71,7 @@ terragrunt_apply: &terragrunt_apply
     command: |
       source $BASH_ENV
       cd $ENV/$SERVICE/
-      terragrunt apply --terragrunt-non-interactive
+      terragrunt apply --terragrunt-non-interactive -auto-approve
 
 ######################### Jobs #########################
 
