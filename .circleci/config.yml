@@ -63,7 +63,7 @@ terragrunt_plan: &terragrunt_plan
     command: |
       source $BASH_ENV
       cd $ENV/$SERVICE/
-      terragrunt plan --terragrunt-non-interactive -out=$ENV/$SERVICE/terraform-$ENV-$SERVICE.plan
+      terragrunt plan --terragrunt-non-interactive -out=terraform-$ENV-$SERVICE.plan
       pwd
       ls
 
@@ -90,7 +90,7 @@ jobs:
       - persist_to_workspace:
           root: *working_directory
           paths:
-            - <<parameters.ENV>>/<<parameters.SERVICE>>/terraform-<<parameters.ENV>>-<<parameters.SERVICE>>.plan
+            - terraform-<<parameters.ENV>>-<<parameters.SERVICE>>.plan
 
   terragrunt-apply:
     <<: *default_config
