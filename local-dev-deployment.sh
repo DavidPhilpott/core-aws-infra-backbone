@@ -9,3 +9,7 @@ cd ..
 
 cd s3-data-lake
 bash local-dev-deployment.sh
+cd ..
+
+cd code-bucket
+bash local-dev-deployment.sh

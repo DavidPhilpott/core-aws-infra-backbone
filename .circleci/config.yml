@@ -128,7 +128,6 @@ workflows:
           filters:
             branches:
               only: release
-
       - terragrunt-apply:
           ENV: prod
           SERVICE: core-sns
@@ -164,10 +163,44 @@ workflows:
           filters:
             branches:
               only: release
-
       - terragrunt-apply:
           ENV: prod
           SERVICE: s3-data-lake
+          requires:
+            - terragrunt-plan
+          filters:
+            branches:
+              only: release
+
+deploy-preprod-code-bucket:
+    jobs:
+      - terragrunt-plan:
+          ENV: preprod
+          SERVICE: code-bucket
+          filters:
+            branches:
+              ignore:
+                - release
+      - terragrunt-apply:
+          ENV: preprod
+          SERVICE: code-bucket
+          requires:
+            - terragrunt-plan
+          filters:
+            branches:
+              only: master
+
+  deploy-prod-s3-data-lake:
+    jobs:
+      - terragrunt-plan:
+          ENV: prod
+          SERVICE: code-bucket
+          filters:
+            branches:
+              only: release
+      - terragrunt-apply:
+          ENV: prod
+          SERVICE: code-bucket
           requires:
             - terragrunt-plan
           filters:
