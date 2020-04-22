@@ -1,6 +1,6 @@
 ENV="dev"
 DOMAIN="Core AWS Infra Backbone"
-SERVICE="S3-Data-Lake"
+SERVICE="Code-Bucket"
 
 printf "Deploying '$DOMAIN - $SERVICE' to $ENV."
 

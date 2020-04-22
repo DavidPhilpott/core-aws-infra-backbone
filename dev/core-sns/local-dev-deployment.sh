@@ -5,6 +5,6 @@ SERVICE="Core-SNS"
 printf "Deploying '$DOMAIN - $SERVICE' to $ENV."
 
 terragrunt init --terragrunt-non-interactive
-terragrunt apply --terragrunt-non-interactive
+terragrunt apply --terragrunt-non-interactive -auto-approve
 
 printf "Done."
