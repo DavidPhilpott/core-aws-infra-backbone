@@ -36,11 +36,6 @@ set_environment: &set_environment
       echo 'export ENV=<<parameters.ENV>>' >> $BASH_ENV
       echo 'export SERVICE=<<parameters.SERVICE>>' >> $BASH_ENV
       echo 'export AWS_REGION=$REGION' >> $BASH_ENV
-      pwd
-      ls
-      cd repo
-      pwd
-      ls
 
 ######################### Steps #########################
 
@@ -60,8 +55,7 @@ terragrunt_init: &terragrunt_init
     command: |
       mkdir -p ~/.ssh && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
       source $BASH_ENV
-      ls
-      cd /repo/$ENV/$SERVICE/
+      cd $ENV/$SERVICE/
       terragrunt init --terragrunt-non-interactive
 
 terragrunt_plan: &terragrunt_plan
@@ -69,7 +63,7 @@ terragrunt_plan: &terragrunt_plan
     name: Terragrunt Plan
     command: |
       source $BASH_ENV
-      cd /repo/$ENV/$SERVICE/
+      cd $ENV/$SERVICE/
       terragrunt plan --terragrunt-non-interactive -out=terraform-$ENV-$SERVICE.plan
 
 terragrunt_apply: &terragrunt_apply
@@ -77,7 +71,7 @@ terragrunt_apply: &terragrunt_apply
     name: Terragrunt Apply
     command: |
       source $BASH_ENV
-      cd /repo/$ENV/$SERVICE/
+      cd $ENV/$SERVICE/
       terragrunt apply terraform-$ENV-$SERVICE.plan
 
 ######################### Jobs #########################
