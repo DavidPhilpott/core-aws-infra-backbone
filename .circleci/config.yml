@@ -64,8 +64,6 @@ terragrunt_plan: &terragrunt_plan
       source $BASH_ENV
       cd $ENV/$SERVICE/
       terragrunt plan --terragrunt-non-interactive -out=terraform-$ENV-$SERVICE.plan
-      pwd
-      ls
 
 terragrunt_apply: &terragrunt_apply
   run:
@@ -73,7 +71,7 @@ terragrunt_apply: &terragrunt_apply
     command: |
       source $BASH_ENV
       cd $ENV/$SERVICE/
-      terragrunt apply terraform-$ENV-$SERVICE.plan
+      terragrunt apply
 
 ######################### Jobs #########################
 
@@ -87,10 +85,6 @@ jobs:
       - *save_repo
       - *terragrunt_init
       - *terragrunt_plan
-      - persist_to_workspace:
-          root: *working_directory
-          paths:
-            - terraform-<<parameters.ENV>>-<<parameters.SERVICE>>.plan
 
   terragrunt-apply:
     <<: *default_config
