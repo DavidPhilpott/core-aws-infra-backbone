@@ -172,7 +172,7 @@ workflows:
             branches:
               only: release
 
-deploy-preprod-code-bucket:
+  deploy-preprod-code-bucket:
     jobs:
       - terragrunt-plan:
           ENV: preprod
@@ -190,7 +190,7 @@ deploy-preprod-code-bucket:
             branches:
               only: master
 
-  deploy-prod-s3-data-lake:
+  deploy-prod-code-bucket:
     jobs:
       - terragrunt-plan:
           ENV: prod
