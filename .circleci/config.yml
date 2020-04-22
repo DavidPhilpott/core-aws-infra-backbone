@@ -38,6 +38,9 @@ set_environment: &set_environment
       echo 'export AWS_REGION=$REGION' >> $BASH_ENV
       pwd
       ls
+      cd repo
+      pwd
+      ls
 
 ######################### Steps #########################
 
