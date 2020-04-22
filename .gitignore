@@ -4,6 +4,9 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
+.terragrunt-cache
 
 # .tfvars files
 #*.tfvars
+
+.idea

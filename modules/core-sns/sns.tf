@@ -1,9 +1,9 @@
 resource "aws_sns_topic" "core_message_inbox" {
-  name = "core-message-inbox"
+  name = "core-message-inbox-${var.environment}"
 
   tags = merge(
     {
-      "Name" = "core-message-inbox"
+      "Name" = "core-message-inbox-${var.environment}"
     },
     local.common_tags
   )

@@ -2,7 +2,11 @@ variable aws_account_id {
   type = string
 }
 
-variable project {
+variable domain {
+  type = string
+}
+
+variable service {
   type = string
 }
 
@@ -12,7 +16,8 @@ variable environment {
 
 locals {
   common_tags = {
-      "Project"     = var.project
+      "Domain"      = var.domain
       "Environment" = var.environment
+      "Service"     = var.service
     }
 }
