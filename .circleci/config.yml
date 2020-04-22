@@ -2,14 +2,11 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@0.1.13
-  terragrunt: kchultman/terragrunt@0.1.12
-
 
 ######################### Environment #########################
 
 base_image: &base_image
-  hashicorp/terraform:light
-
+  alpine/terragrunt
 working_directory: &working_directory
   ~/repo
 
