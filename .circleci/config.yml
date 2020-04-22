@@ -3,29 +3,41 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@0.1.13
 
-set_environment: &set_environment
-  run:
-    name: Setting Environmental Variables
-    command: |
-      cd && touch $BASH_ENV
-      echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> $BASH_ENV
-      echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY' >> $BASH_ENV
+######################### Environment #########################
 
 base_image: &base_image
-  hashicorp/terraform:0.12.2
+  hashicorp/terraform:light
 
 working_directory: &working_directory
-  ~/working
+  ~/repo
 
 default_config: &default_config
   docker:
     - image: *base_image
   working_directory: *working_directory
-  environment:
-    BASH_ENV: /root/.bashrc
+
+parameter_config: &parameter_config
+  parameters:
+    ENV:
+      type: string
+    SERVICE:
+      type: string
 
 repo_cache_key: &repo_cache_key
   v1-repo-{{ .Branch }}-{{ .Revision }}
+
+set_environment: &set_environment
+ run:
+  name: set environments
+  command: |
+      cd && touch $BASH_ENV
+      echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> $BASH_ENV
+      echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY' >> $BASH_ENV
+      echo 'export ENV=<<parameters.ENV>>' >> $BASH_ENV
+      echo 'export SERVICE=<<parameters.SERVICE>>' >> $BASH_ENV
+      echo 'export AWS_REGION=$REGION' >> $BASH_ENV
+
+######################### Steps #########################
 
 restore_repo: &restore_repo
   restore_cache:
@@ -37,84 +49,132 @@ save_repo: &save_repo
     paths:
       - *working_directory
 
-terraform_init: &terraform_init
+terragrunt_init: &terragrunt_init
   run:
-    name: Running Terraform Init
+    name: Terragrunt Init
     command: |
       mkdir -p ~/.ssh && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
       source $BASH_ENV
-      cd terraform
-      ls -ltr
-      terraform init
+      cd /$ENV/$SERVICE/
+      terragrunt init --terragrunt-non-interactive
 
-terraform_plan: &terraform_plan
+terragrunt_plan: &terragrunt_plan
   run:
-    name: Running Terraform Plan
+    name: Terragrunt Plan
     command: |
       source $BASH_ENV
-      pwd && ls -ltr
-      cd terraform
-      terraform plan -out=terraform.plan
+      cd /$ENV/$SERVICE/
+      terragrunt plan --terragrunt-non-interactive -out=terraform-$ENV-$SERVICE.plan
 
-terraform_apply: &terraform_apply
+terragrunt_apply: &terragrunt_apply
   run:
-    name: Running Terraform Apply
+    name: Terragrunt Apply
     command: |
       source $BASH_ENV
-      cd terraform
-      terraform apply terraform.plan
+      cd /$ENV/$SERVICE/
+      terragrunt apply terraform-$ENV-$SERVICE.plan
 
-terraform_destroy: &terraform_destroy
-  run:
-    name: Running Terraform Destroy
-    command: |
-      source $BASH_ENV
-      cd terraform
-      terraform destroy -auto-approve
+######################### Jobs #########################
 
 jobs:
-  run-terraform-plan:
+  terragrunt-plan:
     <<: *default_config
+    <<: *parameter_config
     steps:
       - checkout
       - *set_environment
       - *save_repo
-      - *terraform_init
-      - *terraform_plan
+      - *terragrunt_init
+      - *terragrunt_plan
       - persist_to_workspace:
           root: *working_directory
           paths:
-            - terraform/terraform.plan
+            - <<parameters.ENV>>/<<parameters.SERVICE>>/terraform-<<parameters.ENV>>-<<parameters.SERVICE>>.plan
 
-  run-terraform-apply:
-      <<: *default_config
-      steps:
-        - *restore_repo
-        - *set_environment
-        - attach_workspace:
-            at: *working_directory
-        - *terraform_init
-        - *terraform_apply
+  terragrunt-apply:
+    <<: *default_config
+    <<: *parameter_config
+    steps:
+      - *restore_repo
+      - *set_environment
+      - attach_workspace:
+          at: *working_directory
+      - *terragrunt_init
+      - *terragrunt_apply
 
-  run-terraform-destroy:
-      <<: *default_config
-      steps:
-        - *set_environment
-        - *restore_repo
-        - *terraform_init
-        - *terraform_destroy
+######################### Workflows #########################
 
 workflows:
-  version: 1
-  deploy-infra: 
+  version: 2.1
+
+  deploy-preprod-core-sns:
     jobs:
-      - run-terraform-plan
-      - run-terraform-apply:
+      - terragrunt-plan:
+          ENV: preprod
+          SERVICE: core-sns
+          filters:
+            branches:
+              ignore:
+                - release
+      - terragrunt-apply:
+          ENV: preprod
+          SERVICE: core-sns
           requires:
-            - run-terraform-plan
+            - terragrunt-plan
           filters:
             branches:
               only: master
-#      - run-terraform-destroy:
-#          requires:
-#            - run-terraform-apply#
+
+  deploy-prod-core-sns:
+    jobs:
+      - terragrunt-plan:
+          ENV: prod
+          SERVICE: core-sns
+          filters:
+            branches:
+              only: release
+
+      - terragrunt-apply:
+          ENV: prod
+          SERVICE: core-sns
+          requires:
+            - terragrunt-plan
+          filters:
+            branches:
+              only: release
+
+  deploy-preprod-s3-data-lake:
+    jobs:
+      - terragrunt-plan:
+          ENV: preprod
+          SERVICE: s3-data-lake
+          filters:
+            branches:
+              ignore:
+                - release
+      - terragrunt-apply:
+          ENV: preprod
+          SERVICE: s3-data-lake
+          requires:
+            - terragrunt-plan
+          filters:
+            branches:
+              only: master
+
+  deploy-prod-s3-data-lake:
+    jobs:
+      - terragrunt-plan:
+          ENV: prod
+          SERVICE: s3-data-lake
+          filters:
+            branches:
+              only: release
+
+      - terragrunt-apply:
+          ENV: prod
+          SERVICE: s3-data-lake
+          requires:
+            - terragrunt-plan
+          filters:
+            branches:
+              only: release
