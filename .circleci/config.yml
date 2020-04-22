@@ -28,7 +28,7 @@ repo_cache_key: &repo_cache_key
 
 set_environment: &set_environment
  run:
-  name: set environments
+  name: Set Environmental Variables
   command: |
       cd && touch $BASH_ENV
       echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> $BASH_ENV
@@ -36,6 +36,8 @@ set_environment: &set_environment
       echo 'export ENV=<<parameters.ENV>>' >> $BASH_ENV
       echo 'export SERVICE=<<parameters.SERVICE>>' >> $BASH_ENV
       echo 'export AWS_REGION=$REGION' >> $BASH_ENV
+      pwd
+      ls
 
 ######################### Steps #########################
 
