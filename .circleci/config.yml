@@ -6,8 +6,7 @@ orbs:
 ######################### Environment #########################
 
 base_image: &base_image
-  hashicorp/terraform:light
-
+  alpine/terragrunt
 working_directory: &working_directory
   ~/repo
 
@@ -28,7 +27,7 @@ repo_cache_key: &repo_cache_key
 
 set_environment: &set_environment
  run:
-  name: set environments
+  name: Set Environmental Variables
   command: |
       cd && touch $BASH_ENV
       echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> $BASH_ENV
@@ -55,7 +54,7 @@ terragrunt_init: &terragrunt_init
     command: |
       mkdir -p ~/.ssh && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
       source $BASH_ENV
-      cd /$ENV/$SERVICE/
+      cd $ENV/$SERVICE/
       terragrunt init --terragrunt-non-interactive
 
 terragrunt_plan: &terragrunt_plan
@@ -63,7 +62,7 @@ terragrunt_plan: &terragrunt_plan
     name: Terragrunt Plan
     command: |
       source $BASH_ENV
-      cd /$ENV/$SERVICE/
+      cd $ENV/$SERVICE/
       terragrunt plan --terragrunt-non-interactive -out=terraform-$ENV-$SERVICE.plan
 
 terragrunt_apply: &terragrunt_apply
@@ -71,8 +70,8 @@ terragrunt_apply: &terragrunt_apply
     name: Terragrunt Apply
     command: |
       source $BASH_ENV
-      cd /$ENV/$SERVICE/
-      terragrunt apply terraform-$ENV-$SERVICE.plan
+      cd $ENV/$SERVICE/
+      terragrunt apply
 
 ######################### Jobs #########################
 
@@ -86,10 +85,6 @@ jobs:
       - *save_repo
       - *terragrunt_init
       - *terragrunt_plan
-      - persist_to_workspace:
-          root: *working_directory
-          paths:
-            - <<parameters.ENV>>/<<parameters.SERVICE>>/terraform-<<parameters.ENV>>-<<parameters.SERVICE>>.plan
 
   terragrunt-apply:
     <<: *default_config
